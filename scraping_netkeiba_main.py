@@ -49,8 +49,8 @@ def update_horse_data(DATA_RACE_RESULTS, DATA_HORSE_RESULTS, DATA_PEDS_RESULTS, 
 
 
 def main():
-    START_YEAR = 2019 # スクレイピングする年の開始年
-    END_YEAR = 2020 # スクレイピングする年の終了年
+    START_YEAR = 2020 # スクレイピングする年の開始年
+    END_YEAR = 2023 # スクレイピングする年の終了年
     DATA_BASE_DIR = 'data/scraped_data'
     DATA_RACE_RESULTS = f'{DATA_BASE_DIR}/race_results.csv'
     DATA_RETURN_RESULTS = f'{DATA_BASE_DIR}/return_data.csv'
