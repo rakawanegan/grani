@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ファイルアップロード</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h2 class="my-4">ファイルをアップロードしてください</h2>
+        <form method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="fileInput">ファイルを選択</label>
+                <input type="file" class="form-control-file" id="fileInput" name="file" accept=".csv,.txt,.xlsx">
+            </div>
+            <button type="submit" class="btn btn-primary">アップロード</button>
+        </form>
+        <form action="/collect_results" method="get" class="mt-4">
+            <button type="submit" class="btn btn-success">アンケート結果を回収</button>
+        </form>
+    </div>
+</body>
+</html>
