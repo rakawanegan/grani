@@ -1,11 +1,11 @@
-import tenseal as ts
 import pandas as pd
 import joblib
+from janome.tokenizer import Tokenizer
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from sklearn.preprocessing import OrdinalEncoder
 from functools import partial
+import tenseal as ts
 
-
-# Create the TenSEAL security context
 def create_ctx():
     """Helper for creating the CKKS context.
     CKKS params:
@@ -31,21 +31,45 @@ def tenseal_save(enclist, filename="enc-data/main"):
             metaenclist.append(len(data))
     joblib.dump(metaenclist, f"{filename}-meta.joblib")
 
-def doc2vec(x, model, tokenizer):
-    return None
-    return model.infer_vector(tokenizer(x))
+def expand_arrays(df):
+    # 入れ子の配列を展開する関数
+    def flatten_array(arr):
+        return pd.Series(arr)
+
+    # 各列を処理
+    expanded_df = pd.DataFrame()
+    for col in df.columns:
+        if isinstance(df[col][0], list):
+            expanded_col = df[col].apply(flatten_array)
+            expanded_col.columns = [f"{col}_{i}" for i in range(len(expanded_col.iloc[0]))]
+            expanded_df = pd.concat([expanded_df, expanded_col], axis=1)
+        else:
+            expanded_df[col] = df[col]
+    return expanded_df
+
 
 def df2num(rawdf, document_columns, string_columns):
+    EMBEDDING_DIM = 512
+
+    def _doc2vec(x, model, tokenizer):
+        tokens = [token.surface for token in tokenizer.tokenize(x)]
+        return model.infer_vector(tokens)
     df = rawdf.copy()
-    tokenizer = ""
-    model = ""
-    _doc2vec = partial(doc2vec, model=model, tokenizer=tokenizer)
-    if model == "":
-        df = df.drop(columns=document_columns, axis=1)
-    else:
-        df[document_columns] = df[document_columns].map(_doc2vec)
+    tokenizer = Tokenizer()
+    for document_column in document_columns:
+        tagged_data = [TaggedDocument(words=[token.surface for token in tokenizer.tokenize(doc)], tags=[str(i)]) for i, doc in enumerate(df[document_column].values)]
+        model = Doc2Vec(vector_size=EMBEDDING_DIM, window=10, min_count=1, workers=4)
+        model.build_vocab(tagged_data)
+        model.train(tagged_data, total_examples=model.corpus_count, epochs=model.epochs)
+        doc2vec = partial(_doc2vec, model=model, tokenizer=tokenizer)
+        doclist = df[document_column].apply(doc2vec).tolist()
+        docdf = pd.DataFrame(doclist, index=df.index)
+        docdf.columns = [f"{document_column}_{i}" for i in range(EMBEDDING_DIM)]
+        df = pd.concat([df, docdf], axis=1)
+    df = df.drop(columns=document_columns)        
     oe = OrdinalEncoder()
     df[string_columns] = oe.fit_transform(df[string_columns]).astype(int)
+    # df.to_csv("enc-data/numerical.csv", index=False)
     return df, oe
 
 def df2enc(df, ctx,):
