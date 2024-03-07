@@ -28,7 +28,7 @@ class Results:
         #race_idをkeyにしてDataFrame型を格納
         race_results = {}
         for race_id in tqdm(race_id_list):
-            time.sleep(1)
+            # time.sleep(1)
             try:
                 url = "https://db.netkeiba.com/race/" + race_id
                 # スクレイピング
@@ -118,7 +118,7 @@ class HorseResults:
         #horse_idをkeyにしてDataFrame型を格納
         horse_results = {}
         for horse_id in tqdm(horse_id_list):
-            time.sleep(1)
+            # time.sleep(1)
             try:
                 url = 'https://db.netkeiba.com/horse/' + horse_id
                 df = pd.read_html(url)[3]
@@ -163,7 +163,7 @@ class Peds:
 
         peds_dict = {}
         for horse_id in tqdm(horse_id_list):
-            time.sleep(1)
+            # time.sleep(1)
             try:
                 url = "https://db.netkeiba.com/horse/ped/" + horse_id
                 df = pd.read_html(url)[0]
@@ -212,7 +212,7 @@ class Return:
 
         return_tables = {}
         for race_id in tqdm(race_id_list):
-            time.sleep(1)
+            # time.sleep(1)
             try:
                 url = "https://db.netkeiba.com/race/" + race_id
 
@@ -284,5 +284,5 @@ def get_race_id_list(year_start:int, year_end:int) -> list:
                                 time.sleep(10 + random.randint(1,3))  # 10秒待機
                             pbar.set_description(f"Progress race_id: {race_id}")
                             pbar.update(1)
-                            time.sleep(1)
+                            # time.sleep(1)
     return race_id_list
