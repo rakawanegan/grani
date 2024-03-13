@@ -1,2 +1,3 @@
 *.pyc
 *.csv
+!/prj-grani/server/src/*.csv
